@@ -1,0 +1,33 @@
+# Load-balancer: round-robin + health-check failover across the two egress nodes.
+# Copy to docker-compose.yml and replace <NODE_A_TSIP> / <NODE_B_TSIP> with your
+# routers' Tailscale IPs (from `tailscale status`).
+#
+# strategy=round    -> alternate between the two nodes (use both at once)
+# max_fails=1       -> mark a node dead after 1 failed dial
+# fail_timeout=30s  -> keep it out for 30s, then retry (auto-recovery)
+#
+# Exposes a SOCKS5 listener on :1080 of whatever network namespace it shares.
+# Point your client PAC at  <BALANCER_IP>:1080  (see ../client/proxy.pac.example).
+
+services:
+  gost-lb:
+    image: ginuerzh/gost:2.12.0
+    container_name: gost-lb
+    restart: unless-stopped
+
+    # ---- Networking: pick ONE of the two modes below --------------------------
+
+    # MODE A (most common): the Docker HOST is itself a Tailscale node.
+    # Host networking lets gost reach the tailnet via the host's tailscale0,
+    # and the listener appears on the host's tailnet IP. Clients use that IP.
+    network_mode: host
+
+    # MODE B: Tailscale runs INSIDE another container (host is NOT on the tailnet).
+    # Share that container's network namespace instead. Comment out MODE A above
+    # and uncomment the line below (replace 'tailscale' with your container name).
+    # The listener then appears on the Tailscale container's tailnet IP.
+    # network_mode: "container:tailscale"
+
+    command:
+      - "-L=socks5://:1080"
+      - "-F=socks5://<NODE_A_TSIP>:1080?ip=<NODE_A_TSIP>:1080,<NODE_B_TSIP>:1080&strategy=round&max_fails=1&fail_timeout=30s"

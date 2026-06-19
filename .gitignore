@@ -1,0 +1,21 @@
+# Promo / marketing imagery — generated separately, do NOT commit to repo
+assets/*.png
+assets/*.jpg
+assets/*.jpeg
+assets/*.webp
+assets/*.gif
+assets/*.svg
+# (The text prompt assets/PROMO-IMAGE-PROMPT.md is intentionally tracked.)
+
+# Local secrets / real configs (never commit) — use the *.example templates instead
+*.real
+*.local
+secrets.env
+.env
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

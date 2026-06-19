@@ -1,0 +1,33 @@
+// proxy.pac.example
+//
+// EN: Selective routing — send ONLY the target service's domains through your
+//     balancer; everything else goes DIRECT (no speed/geo side effects).
+// KO: 선택적 라우팅 — 대상 서비스의 도메인만 밸런서로 보내고, 나머지는 DIRECT(직결).
+//     (전체 트래픽을 안 태우므로 속도/지역 부작용 없음.)
+//
+// EN: 1) Replace <BALANCER_IP> with your balancer's Tailscale IP and port.
+//     2) Edit `viaProxy` for YOUR service. To find a service's domains: open it,
+//        press F12 -> Network, play a video, and collect the API + video/CDN hosts.
+// KO: 1) <BALANCER_IP> 를 밸런서의 Tailscale IP:포트로 교체.
+//     2) `viaProxy` 목록을 대상 서비스에 맞게 수정. 도메인 찾기: 서비스 열고
+//        F12 -> Network 탭에서 영상 재생 후 API/영상(CDN) 호스트들을 수집.
+//
+// EN/KO: Apply via "Proxy SwitchyOmega 3 (ZeroOmega)" (Chrome/Edge):
+//        New profile -> PAC Profile -> paste -> Apply -> select profile.
+//        SOCKS5 resolves DNS at the proxy / SOCKS5라 DNS도 프록시에서 해석(지역판정 정확).
+
+function FindProxyForURL(url, host) {
+  var viaProxy = [
+    // --- Chzzk (치지직) example domain set / 치지직 예시 도메인 ---
+    "chzzk.naver.com", "*.chzzk.naver.com",
+    "*.naver.com",        // api.chzzk / game.naver.com (live chat 채팅) / etc.
+    "*.pstatic.net",      // livecloud.pstatic.net = live HLS video CDN / 라이브 영상
+    "*.navercdn.net"
+  ];
+  for (var i = 0; i < viaProxy.length; i++) {
+    if (shExpMatch(host, viaProxy[i])) {
+      return "SOCKS5 <BALANCER_IP>:1080";
+    }
+  }
+  return "DIRECT";
+}
