@@ -2,8 +2,6 @@
 
 ![서울·부산 라우터 2대를 묶어 해외 클라이언트로 보내는 구성도](assets/promo.png)
 
-> ▶ **움직이는 다이어그램(라이브 데모):** GitHub Pages를 켜면 `https://taehyungalexkim.github.io/tailnet-georoute/` 에서 애니메이션으로 볼 수 있어요. (켜는 법은 맨 아래)
-
 **한국에 둔 라우터 2대로, 해외에서 한국 서비스를 끊김 없이 보는 방법.**
 [Tailscale](https://tailscale.com) 위에서 *원하는 서비스의 트래픽만* 골라 한국으로 보냅니다. 두 라우터를 번갈아 쓰다가(라운드로빈) 한쪽이 느려지거나 끊기면 자동으로 다른 쪽으로 넘어가요. 이미 가지고 있는 장비로, 매달 나가는 구독료 없이.
 
@@ -79,9 +77,6 @@ for i in 1 2 3 4; do curl -fsS --socks5-hostname <BALANCER_IP>:1080 https://api.
 - **클라이언트에서 타임아웃** — 내 기기의 Tailscale이 꺼졌거나 exit node가 잡혀 있어요. 켜고, exit node는 None.
 - **페이지는 뜨는데 영상만 안 나옴** — 영상 CDN 도메인이 PAC에서 빠진 경우. F12 → Network에서 그 도메인을 찾아 PAC에 추가.
 - **라우터 펌웨어 업데이트 후 gost가 사라짐** — GL.iNet은 펌웨어 갱신 때 지워질 수 있어요. `setup-brume.sh`를 다시 실행하세요.
-
-## 라이브 데모(애니메이션) 띄우기 — GitHub Pages
-저장소 **Settings → Pages → Source**를 `main` 브랜치 / 루트(`/`)로 지정하면, 몇 분 뒤 `https://taehyungalexkim.github.io/tailnet-georoute/` 에서 `index.html`(움직이는 다이어그램)이 열립니다.
 
 ## ⚠️ 면책
 이 프로젝트는 **본인 소유** 장비로 **본인** 트래픽을 우회시키는 네트워크 구성입니다. 지역 제한 우회는 서비스의 이용약관이나 콘텐츠 라이선스에 어긋날 수 있어요. 관련 법과 약관을 지킬 책임은 사용자에게 있습니다. 교육 목적의 "있는 그대로(as-is)" 제공이며, 어떤 보증이나 지원도 약속하지 않습니다.
