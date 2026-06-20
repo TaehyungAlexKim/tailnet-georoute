@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tailnet-georoute — live diagram / 라이브 다이어그램</title>
+<style>
+  :root{
+    --blue:#2f6fed; --blue-d:#1d4ed8; --teal:#0d9488;
+    --dark:#11203b; --amber:#f59e0b; --ink:#1f2a44; --muted:#6b7a99;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    min-height:100vh; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:18px; padding:28px 16px;
+    background:linear-gradient(160deg,#eef4fc,#dbe4f0);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo",sans-serif;
+    color:var(--ink);
+  }
+  h1{font-size:20px;font-weight:800;letter-spacing:-.2px}
+  h1 small{font-weight:600;color:var(--muted);font-size:14px}
+  .card{
+    width:min(1100px,96vw); background:#fff; border-radius:22px;
+    box-shadow:0 18px 50px rgba(28,52,99,.16); padding:10px;
+  }
+  svg{width:100%;height:auto;display:block;border-radius:16px}
+  .cap{font-size:13px;color:var(--muted);text-align:center;max-width:760px;line-height:1.6}
+  a{color:var(--blue);text-decoration:none;font-weight:600}
+
+  /* flowing encrypted tunnels / 흐르는 암호화 터널 */
+  .flow{stroke-dasharray:6 20;animation:dash 1.1s linear infinite}
+  .flow.slow{animation-duration:1.5s}
+  @keyframes dash{to{stroke-dashoffset:-26}}
+  /* round-robin spinner / 라운드로빈 회전 */
+  .rr{transform-box:fill-box;transform-origin:center;animation:spin 3.2s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  /* gentle pulse on padlocks & nodes */
+  .pulse{animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+  .lbl{font:700 15px/1 -apple-system,"Apple SD Gothic Neo",sans-serif;fill:var(--ink)}
+  .sub{font:600 12px/1 -apple-system,"Apple SD Gothic Neo",sans-serif;fill:var(--muted)}
+  .zone{font:800 15px/1 -apple-system,sans-serif;letter-spacing:.4px}
+  @media (prefers-reduced-motion: reduce){.flow,.rr,.pulse{animation:none}}
+</style>
+</head>
+<body>
+  <h1>tailnet-georoute &nbsp;<small>한국 라우터 2대 · 라운드로빈 · 자동 페일오버</small></h1>
+
+  <div class="card">
+  <svg viewBox="0 0 1200 660" xmlns="http://www.w3.org/2000/svg" role="img"
+       aria-label="Two Korea routers (Seoul, Busan) load-balanced to overseas clients over Tailscale">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#f1f6fd"/><stop offset="1" stop-color="#e6effc"/>
+      </linearGradient>
+    </defs>
+    <rect width="1200" height="660" rx="16" fill="url(#bg)"/>
+
+    <!-- zone panels -->
+    <rect x="40" y="60" width="320" height="540" rx="20" fill="#fff" opacity=".55"/>
+    <rect x="392" y="60" width="768" height="540" rx="20" fill="#fff" opacity=".4"/>
+    <text x="70" y="98" class="zone" fill="#2f6fed">KOREA <tspan fill="#6b7a99">한국</tspan></text>
+    <text x="420" y="98" class="zone" fill="#11203b">OVERSEAS <tspan fill="#6b7a99">해외</tspan></text>
+
+    <!-- ===== Seoul router ===== -->
+    <g>
+      <g opacity=".5"><rect x="120" y="150" width="14" height="40" fill="#9db8e8"/><rect x="140" y="135" width="14" height="55" fill="#9db8e8"/><rect x="160" y="160" width="14" height="30" fill="#9db8e8"/></g>
+      <rect x="95" y="200" width="150" height="64" rx="14" fill="#2f6fed"/>
+      <circle cx="120" cy="232" r="6" fill="#bcd2ff"/><circle cx="142" cy="232" r="6" fill="#bcd2ff"/>
+      <rect x="163" y="190" width="5" height="16" rx="2" fill="#2f6fed"/>
+      <text x="170" y="296" text-anchor="middle" class="lbl">SEOUL</text>
+      <text x="170" y="316" text-anchor="middle" class="sub">서울 · ISP A</text>
+    </g>
+    <!-- ===== Busan router ===== -->
+    <g>
+      <g opacity=".5"><rect x="120" y="360" width="14" height="34" fill="#94d3cc"/><rect x="140" y="348" width="14" height="46" fill="#94d3cc"/><rect x="160" y="368" width="14" height="26" fill="#94d3cc"/></g>
+      <rect x="95" y="404" width="150" height="64" rx="14" fill="#0d9488"/>
+      <circle cx="120" cy="436" r="6" fill="#b8efe8"/><circle cx="142" cy="436" r="6" fill="#b8efe8"/>
+      <rect x="163" y="394" width="5" height="16" rx="2" fill="#0d9488"/>
+      <text x="170" y="500" text-anchor="middle" class="lbl">BUSAN</text>
+      <text x="170" y="520" text-anchor="middle" class="sub">부산 · ISP B</text>
+    </g>
+
+    <!-- ===== encrypted tunnels (animated) ===== -->
+    <path d="M250,232 C400,232 470,300 560,318" fill="none" stroke="#2f6fed" stroke-width="7" stroke-linecap="round" class="flow"/>
+    <path d="M250,436 C400,436 470,380 560,360" fill="none" stroke="#0d9488" stroke-width="7" stroke-linecap="round" class="flow slow"/>
+    <!-- padlocks -->
+    <g class="pulse" transform="translate(398,256)"><rect x="-9" y="0" width="18" height="14" rx="3" fill="#11203b"/><path d="M-5,0 v-4 a5,5 0 0 1 10,0 v4" fill="none" stroke="#11203b" stroke-width="3"/></g>
+    <g class="pulse" transform="translate(398,402)"><rect x="-9" y="0" width="18" height="14" rx="3" fill="#11203b"/><path d="M-5,0 v-4 a5,5 0 0 1 10,0 v4" fill="none" stroke="#11203b" stroke-width="3"/></g>
+    <text x="470" y="565" text-anchor="middle" class="sub">encrypted Tailscale tunnels · 암호화 터널</text>
+
+    <!-- ===== load balancer ===== -->
+    <rect x="560" y="290" width="120" height="120" rx="20" fill="#1d4ed8"/>
+    <g stroke="#cdddff" stroke-width="6" fill="none" stroke-linecap="round">
+      <circle cx="600" cy="330" r="7" fill="#cdddff" stroke="none"/>
+      <circle cx="600" cy="370" r="7" fill="#cdddff" stroke="none"/>
+      <circle cx="645" cy="350" r="7" fill="#cdddff" stroke="none"/>
+      <path d="M600,330 H622 a6,6 0 0 1 6,6 v8 a6,6 0 0 0 6,6"/>
+      <path d="M600,370 H622 a6,6 0 0 0 6,-6 v-8 a6,6 0 0 1 6,-6"/>
+    </g>
+    <text x="620" y="438" text-anchor="middle" class="lbl">LOAD BALANCER</text>
+    <text x="620" y="458" text-anchor="middle" class="sub">로드밸런서</text>
+    <!-- round-robin spinner (translate on outer g, rotate on inner g) -->
+    <g transform="translate(620,250)">
+      <g class="rr">
+        <path d="M-18,0 A18,18 0 0 1 14,-11" fill="none" stroke="#f59e0b" stroke-width="5" stroke-linecap="round"/>
+        <path d="M18,0 A18,18 0 0 1 -14,11" fill="none" stroke="#f59e0b" stroke-width="5" stroke-linecap="round"/>
+        <path d="M14,-11 l6,-2 -2,7 z" fill="#f59e0b"/>
+        <path d="M-14,11 l-6,2 2,-7 z" fill="#f59e0b"/>
+      </g>
+    </g>
+    <text x="620" y="212" text-anchor="middle" class="sub">round-robin / failover</text>
+
+    <!-- ===== output to clients (animated) ===== -->
+    <path d="M680,350 C760,350 820,350 880,350" fill="none" stroke="#f59e0b" stroke-width="7" stroke-linecap="round" class="flow"/>
+
+    <!-- laptop -->
+    <g>
+      <rect x="900" y="300" width="150" height="92" rx="10" fill="#11203b"/>
+      <rect x="912" y="312" width="126" height="68" rx="4" fill="#1c3a63"/>
+      <path d="M972,330 l26,16 -26,16 z" fill="#ffffff"/>
+      <rect x="888" y="392" width="174" height="10" rx="5" fill="#0c1730"/>
+    </g>
+    <!-- phone -->
+    <g>
+      <rect x="1072" y="318" width="46" height="80" rx="9" fill="#11203b"/>
+      <rect x="1078" y="328" width="34" height="56" rx="3" fill="#1c3a63"/>
+      <circle cx="1095" cy="392" r="3" fill="#42629a"/>
+    </g>
+    <text x="1008" y="436" text-anchor="middle" class="lbl">CLIENTS</text>
+    <text x="1008" y="456" text-anchor="middle" class="sub">시청자 · 브라우저 PAC</text>
+  </svg>
+  </div>
+
+  <p class="cap">
+    한국에 둔 라우터 2대(서울·부산)를 동시에 쓰면서 한쪽이 끊기면 자동으로 넘어갑니다.
+    필요한 서비스만 골라 보내고 나머지는 직접 연결. &nbsp;·&nbsp;
+    Two Korean routers, used together with automatic failover; only the target service is routed.
+    &nbsp;·&nbsp; <a href="README.md">README →</a>
+  </p>
+</body>
+</html>

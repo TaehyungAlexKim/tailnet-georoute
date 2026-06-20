@@ -1,19 +1,24 @@
-# Promo / marketing imagery — generated separately, do NOT commit to repo
-assets/*.png
+# --- Assets policy ---------------------------------------------------------
+# The committed promo image (assets/promo.png) and the animated index.html ARE
+# tracked. The heavy 5MB bundled source and the generation prompt are NOT.
+assets/*.html
+assets/PROMO-IMAGE-PROMPT.md
 assets/*.jpg
 assets/*.jpeg
 assets/*.webp
 assets/*.gif
 assets/*.svg
-# (The text prompt assets/PROMO-IMAGE-PROMPT.md is intentionally tracked.)
+assets/*.png
+# exception: keep the promo image used in the docs (no inline comments in .gitignore!)
+!assets/promo.png
 
-# Local secrets / real configs (never commit) — use the *.example templates instead
+# --- Local secrets / real configs (use the *.example templates instead) -----
 *.real
 *.local
 secrets.env
 .env
 
-# OS / editor junk
+# --- OS / editor junk -------------------------------------------------------
 .DS_Store
 Thumbs.db
 *.swp
